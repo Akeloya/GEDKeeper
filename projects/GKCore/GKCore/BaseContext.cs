@@ -1,6 +1,6 @@
 ﻿/*
  *  "GEDKeeper", the personal genealogical database editor.
- *  Copyright (C) 2009-2019 by Sergey V. Zhdanovskih.
+ *  Copyright (C) 2009-2020 by Sergey V. Zhdanovskih.
  *
  *  This file is part of "GEDKeeper".
  *
@@ -32,16 +32,19 @@ using GDModel;
 using GDModel.Providers;
 using GDModel.Providers.GEDCOM;
 using GDModel.Providers.GedML;
+using GKCore.Controllers;
 using GKCore.Cultures;
 using GKCore.Interfaces;
 using GKCore.MVP.Views;
+using GKCore.Names;
 using GKCore.Operations;
 using GKCore.Options;
+using GKCore.Search;
 using GKCore.Types;
 
 namespace GKCore
 {
-    public class MediaFileNotFoundException : Exception
+    public class MediaFileNotFoundException : GKException
     {
         public MediaFileNotFoundException(string fileName)
             : base(string.Format("Media file {0} not found", fileName))
@@ -78,7 +81,7 @@ namespace GKCore
             {
                 GDMLanguageID langID = fTree.Header.Language;
                 if (fCulture == null || fCulture.Language != langID) {
-                    fCulture = GetCultureByLang(langID);
+                    fCulture = CulturesPool.DefineCulture(langID);
                 }
                 return fCulture;
             }
@@ -531,70 +534,13 @@ namespace GKCore
                     // temp stub, remove try/finally here?
                 }
             } catch (Exception ex) {
-                Logger.LogWrite("BaseContext.CollectTips(): " + ex.Message);
+                Logger.WriteError("BaseContext.CollectTips()", ex);
             }
         }
 
         #endregion
 
         #region Name and sex functions
-
-        public static ICulture GetCultureByLang(GDMLanguageID langID)
-        {
-            ICulture culture;
-            switch (langID) {
-                case GDMLanguageID.Russian:
-                case GDMLanguageID.Ukrainian:
-                case GDMLanguageID.Kazakh:
-                    culture = new RussianCulture();
-                    break;
-
-                case GDMLanguageID.Polish:
-                    culture = new PolishCulture();
-                    break;
-
-                case GDMLanguageID.German:
-                    culture = new GermanCulture();
-                    break;
-
-                case GDMLanguageID.Swedish:
-                    culture = new SwedishCulture();
-                    break;
-
-                case GDMLanguageID.Icelandic:
-                    culture = new IcelandCulture();
-                    break;
-
-                case GDMLanguageID.Armenian:
-                    culture = new ArmenianCulture();
-                    break;
-
-                case GDMLanguageID.Turkish:
-                    culture = new TurkishCulture();
-                    break;
-
-                case GDMLanguageID.French:
-                    culture = new FrenchCulture();
-                    break;
-
-                case GDMLanguageID.Italian:
-                    culture = new ItalianCulture();
-                    break;
-
-                case GDMLanguageID.Cantonese:
-                case GDMLanguageID.Mandrin:
-                    culture = new ChineseCulture();
-                    break;
-
-                case GDMLanguageID.English:
-                default:
-                    culture = new BritishCulture();
-                    break;
-            }
-
-            culture.Language = langID;
-            return culture;
-        }
 
         public string DefinePatronymic(string name, GDMSex sex, bool confirm)
         {
@@ -918,7 +864,7 @@ namespace GKCore
                         }
                 }
             } catch (Exception ex) {
-                Logger.LogWrite("BaseContext.MediaLoad_fn(): " + ex.Message);
+                Logger.WriteError("BaseContext.MediaLoad_fn()", ex);
                 fileName = "";
             }
 
@@ -1057,7 +1003,7 @@ namespace GKCore
 
                 return result;
             } catch (Exception ex) {
-                Logger.LogWrite("BaseContext.MediaDelete(): " + ex.Message);
+                Logger.WriteError("BaseContext.MediaDelete()", ex);
                 return false;
             }
         }
@@ -1115,7 +1061,7 @@ namespace GKCore
                         break;
                 }
             } catch (Exception ex) {
-                Logger.LogWrite("BaseContext.VerifyMediaFile(): " + ex.Message);
+                Logger.WriteError("BaseContext.VerifyMediaFile()", ex);
                 fileName = string.Empty;
             }
 
@@ -1180,7 +1126,7 @@ namespace GKCore
             } catch (MediaFileNotFoundException) {
                 throw;
             } catch (Exception ex) {
-                Logger.LogWrite("BaseContext.LoadMediaImage(): " + ex.Message);
+                Logger.WriteError("BaseContext.LoadMediaImage()", ex);
                 result = null;
             }
             return result;
@@ -1205,7 +1151,7 @@ namespace GKCore
             } catch (MediaFileNotFoundException) {
                 throw;
             } catch (Exception ex) {
-                Logger.LogWrite("BaseContext.LoadMediaImage(): " + ex.Message);
+                Logger.WriteError("BaseContext.LoadMediaImage()", ex);
                 result = null;
             }
             return result;
@@ -1232,7 +1178,7 @@ namespace GKCore
             } catch (MediaFileNotFoundException) {
                 throw;
             } catch (Exception ex) {
-                Logger.LogWrite("BaseContext.GetPrimaryBitmap(): " + ex.Message);
+                Logger.WriteError("BaseContext.GetPrimaryBitmap()", ex);
                 result = null;
             }
             return result;
@@ -1247,7 +1193,7 @@ namespace GKCore
                 GDMMultimediaLink mmLink = iRec.GetPrimaryMultimediaLink();
                 result = (mmLink == null) ? null : mmLink.GetUID();
             } catch (Exception ex) {
-                Logger.LogWrite("BaseContext.GetPrimaryBitmapUID(): " + ex.Message);
+                Logger.WriteError("BaseContext.GetPrimaryBitmapUID()", ex);
                 result = null;
             }
             return result;
@@ -1338,8 +1284,7 @@ namespace GKCore
 
                 AppHost.ForceGC();
             } catch (Exception ex) {
-                Logger.LogWrite("BaseContext.FileLoad(): " + ex.Message);
-                Logger.LogWrite("BaseContext.FileLoad(): " + ex.StackTrace.ToString());
+                Logger.WriteError("BaseContext.FileLoad()", ex);
                 AppHost.StdDialogs.ShowError(LangMan.LS(LSID.LSID_LoadGedComFailed));
             }
 
@@ -1375,7 +1320,7 @@ namespace GKCore
                 AppHost.StdDialogs.ShowError(string.Format(LangMan.LS(LSID.LSID_FileSaveError), new object[] { fileName, ": access denied" }));
             } catch (Exception ex) {
                 AppHost.StdDialogs.ShowError(string.Format(LangMan.LS(LSID.LSID_FileSaveError), new object[] { fileName, "" }));
-                Logger.LogWrite("BaseContext.FileSave(): " + ex.Message);
+                Logger.WriteError("BaseContext.FileSave()", ex);
             }
 
             return result;
@@ -1464,7 +1409,7 @@ namespace GKCore
                 var gedcomProvider = new GEDCOMProvider(fTree);
                 gedcomProvider.SaveToFile(rfn, charSet);
             } catch (Exception ex) {
-                Logger.LogWrite("BaseContext.CriticalSave(): " + ex.Message);
+                Logger.WriteError("BaseContext.CriticalSave()", ex);
             }
         }
 
@@ -1681,9 +1626,7 @@ namespace GKCore
 
             try {
                 using (var dlg = AppHost.ResolveDialog<IRecordSelectDialog>(fViewer, GDMRecordType.rtFamily)) {
-                    dlg.TargetIndividual = target;
-                    dlg.NeedSex = GDMSex.svUnknown;
-                    dlg.TargetMode = TargetMode.tmFamilyChild;
+                    dlg.SetTarget(TargetMode.tmFamilyChild, target, GDMSex.svUnknown);
                     dlg.FastFilter = "*";
 
                     if (AppHost.Instance.ShowModalX(dlg, false)) {
@@ -1693,23 +1636,20 @@ namespace GKCore
                     }
                 }
             } catch (Exception ex) {
-                Logger.LogWrite("BaseContext.SelectFamily(): " + ex.Message);
+                Logger.WriteError("BaseContext.SelectFamily()", ex);
                 result = null;
             }
 
             return result;
         }
 
-        public GDMIndividualRecord SelectPerson(GDMIndividualRecord target,
-                                                   TargetMode targetMode, GDMSex needSex)
+        public GDMIndividualRecord SelectPerson(GDMIndividualRecord target, TargetMode targetMode, GDMSex needSex)
         {
             GDMIndividualRecord result;
 
             try {
                 using (var dlg = AppHost.ResolveDialog<IRecordSelectDialog>(fViewer, GDMRecordType.rtIndividual)) {
-                    dlg.TargetIndividual = target;
-                    dlg.NeedSex = needSex;
-                    dlg.TargetMode = targetMode;
+                    dlg.SetTarget(targetMode, target, needSex);
                     dlg.FastFilter = "*";
 
                     if (AppHost.Instance.ShowModalX(dlg, false)) {
@@ -1719,7 +1659,7 @@ namespace GKCore
                     }
                 }
             } catch (Exception ex) {
-                Logger.LogWrite("BaseContext.SelectPerson(): " + ex.Message);
+                Logger.WriteError("BaseContext.SelectPerson()", ex);
                 result = null;
             }
 
@@ -1745,7 +1685,7 @@ namespace GKCore
                     }
                 }
             } catch (Exception ex) {
-                Logger.LogWrite("BaseContext.SelectRecord(): " + ex.Message);
+                Logger.WriteError("BaseContext.SelectRecord()", ex);
                 result = null;
             }
 
@@ -1874,15 +1814,7 @@ namespace GKCore
                     return null;
             }
 
-            GDMIndividualRecord target = null;
-            TargetMode targetMode = TargetMode.tmNone;
-            if (needSex == GDMSex.svFemale) {
-                target = iRec;
-                targetMode = TargetMode.tmWife;
-            }
-
-            GDMIndividualRecord result = SelectPerson(target, targetMode, needSex);
-            return result;
+            return SelectPerson(iRec, TargetMode.tmSpouse, needSex);
         }
 
         public void ProcessFamily(GDMFamilyRecord famRec)

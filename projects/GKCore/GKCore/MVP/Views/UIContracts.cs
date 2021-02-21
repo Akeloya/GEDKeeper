@@ -28,6 +28,7 @@ using GKCore.Charts;
 using GKCore.Interfaces;
 using GKCore.Lists;
 using GKCore.MVP.Controls;
+using GKCore.Names;
 using GKCore.Options;
 using GKCore.Types;
 
@@ -91,7 +92,7 @@ namespace GKCore.MVP.Views
 
         ITextBox Corresponder { get; }
         IComboBox CorrType { get; }
-        ITextBox Date { get; }
+        IDateBox Date { get; }
         IComboBox Dir { get; }
         ITextBox Name { get; }
 
@@ -125,8 +126,8 @@ namespace GKCore.MVP.Views
         IComboBox Date1Calendar { get; }
         IComboBox Date2Calendar { get; }
 
-        IDateBoxHandler Date1 { get; }
-        IDateBoxHandler Date2 { get; }
+        IDateBox Date1 { get; }
+        IDateBox Date2 { get; }
 
         IComboBox Attribute { get; }
         ITextBox Place { get; }
@@ -424,12 +425,12 @@ namespace GKCore.MVP.Views
     public interface IRecordSelectDialog : ICommonDialog, IBaseEditor, IView
     {
         string FastFilter { get; set; }
-        TargetMode TargetMode { get; set; }
-        GDMIndividualRecord TargetIndividual { get; set; }
-        GDMSex NeedSex { get; set; }
         GDMRecord ResultRecord { get; set; }
 
+        ITextBox FilterBox { get; }
         IListViewEx RecordsList { get; }
+
+        void SetTarget(TargetMode mode, GDMIndividualRecord target, GDMSex needSex);
     }
 
 
@@ -464,8 +465,8 @@ namespace GKCore.MVP.Views
         ITextBox Name { get; }
         IComboBox Priority { get; }
         IComboBox Status { get; }
-        ITextBox StartDate { get; }
-        ITextBox StopDate { get; }
+        IDateBox StartDate { get; }
+        IDateBox StopDate { get; }
         INumericBox Percent { get; }
     }
 
@@ -535,8 +536,8 @@ namespace GKCore.MVP.Views
 
         ISheetList NotesList { get; }
         IComboBox Priority { get; }
-        ITextBox StartDate { get; }
-        ITextBox StopDate { get; }
+        IDateBox StartDate { get; }
+        IDateBox StopDate { get; }
         IComboBox GoalType { get; }
         ITextBox Goal { get; }
         IButton GoalSelect { get; }
@@ -545,7 +546,7 @@ namespace GKCore.MVP.Views
 
     public interface ITreeChartWin : IChartWindow, IView
     {
-        ITreeChartBox TreeBox { get; }
+        ITreeChart TreeBox { get; }
 
         void GenChart(TreeChartKind chartKind);
     }

@@ -27,6 +27,7 @@ using GDModel;
 using GKCore;
 using GKCore.Interfaces;
 using GKCore.Lists;
+using GKCore.Options;
 
 namespace GKUI.Components
 {
@@ -165,14 +166,14 @@ namespace GKUI.Components
             // check for new and empty struct
             if (form == null || rt.IsEmpty()) return;
 
-            if (winState != WindowState.Minimized) {
+            if (winState != Eto.Forms.WindowState.Minimized) {
                 form.Location = new Point(rt.Left, rt.Top);
                 form.Width = rt.GetWidth();
                 form.Height = rt.GetHeight();
 
                 form.WindowState = winState;
             } else {
-                form.WindowState = WindowState.Maximized;
+                form.WindowState = Eto.Forms.WindowState.Maximized;
             }
         }
 
@@ -196,7 +197,7 @@ namespace GKUI.Components
 
         public static T GetSelectedTag<T>(ComboBox comboBox)
         {
-            GKComboItem comboItem = (GKComboItem)comboBox.SelectedValue;
+            GKComboItem<T> comboItem = (GKComboItem<T>)comboBox.SelectedValue;
             T itemTag = (T)comboItem.Tag;
             return itemTag;
         }
@@ -204,7 +205,7 @@ namespace GKUI.Components
         public static void SetSelectedTag<T>(ComboBox comboBox, T tagValue, bool allowDefault = true)
         {
             foreach (object item in comboBox.Items) {
-                GKComboItem comboItem = (GKComboItem)item;
+                GKComboItem<T> comboItem = (GKComboItem<T>)item;
                 T itemTag = (T)comboItem.Tag;
 
                 if (object.Equals(itemTag, tagValue)) {
@@ -384,6 +385,19 @@ namespace GKUI.Components
         {
             using (var clipboard = new Clipboard()) {
                 clipboard.Text = text;
+            }
+        }
+
+        public static void ProcessName(object sender)
+        {
+            TextBox tb = (sender as TextBox);
+            if (tb != null && GlobalOptions.Instance.FirstCapitalLetterInNames) {
+                tb.Text = ConvertHelper.UniformName(tb.Text);
+            }
+
+            ComboBox cmb = (sender as ComboBox);
+            if (cmb != null && GlobalOptions.Instance.FirstCapitalLetterInNames) {
+                cmb.Text = ConvertHelper.UniformName(cmb.Text);
             }
         }
     }

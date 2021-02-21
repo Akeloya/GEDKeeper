@@ -232,7 +232,7 @@ namespace GKUI
                 InputLanguage currentLang = InputLanguage.FromCulture(cultureInfo);
                 InputLanguage.CurrentInputLanguage = currentLang;*/
             } catch (Exception ex) {
-                Logger.LogWrite("EtoFormsAppHost.SetKeyLayout(): " + ex.Message);
+                Logger.WriteError("EtoFormsAppHost.SetKeyLayout()", ex);
             }
         }
 
@@ -258,9 +258,9 @@ namespace GKUI
 
             // controls and other
             container.Register<IStdDialogs, EtoStdDialogs>(LifeCycle.Singleton);
-            container.Register<IGraphicsProvider, EtoGfxProvider>(LifeCycle.Singleton);
+            container.Register<IGraphicsProviderEx, EtoGfxProvider>(LifeCycle.Singleton);
             container.Register<IProgressController, ProgressController>(LifeCycle.Singleton);
-            container.Register<ITreeChartBox, TreeChartBox>(LifeCycle.Transient);
+            container.Register<ITreeChart, TreeChartBox>(LifeCycle.Transient);
 
             // dialogs
             container.Register<IAboutDlg, AboutDlg>(LifeCycle.Transient);

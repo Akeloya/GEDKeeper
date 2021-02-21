@@ -1,6 +1,6 @@
 ﻿/*
  *  "GEDKeeper", the personal genealogical database editor.
- *  Copyright (C) 2009-2018 by Sergey V. Zhdanovskih.
+ *  Copyright (C) 2009-2020 by Sergey V. Zhdanovskih.
  *
  *  This file is part of "GEDKeeper".
  *
@@ -130,7 +130,7 @@ namespace GKCore.Controllers
                     PlacesCache.Instance.Save();
                 }
             } catch (Exception ex) {
-                Logger.LogWrite("MapsViewerWin.PlacesLoad(): " + ex.Message);
+                Logger.WriteError("MapsViewerWin.PlacesLoad()", ex);
             }
         }
 
@@ -169,8 +169,16 @@ namespace GKCore.Controllers
 
                 mapPlace.PlaceRefs.Add(new PlaceRef(placeEvent));
             } catch (Exception ex) {
-                Logger.LogWrite("MapsViewerWin.AddPlace(): " + ex.Message);
+                Logger.WriteError("MapsViewerWin.AddPlace()", ex);
             }
+        }
+
+        public void SetCenter()
+        {
+            GeoPoint pt = fView.PlacesTree.GetSelectedData() as GeoPoint;
+            if (pt == null) return;
+
+            fView.MapBrowser.SetCenter(pt.Latitude, pt.Longitude, -1);
         }
 
         public void SelectPlaces()

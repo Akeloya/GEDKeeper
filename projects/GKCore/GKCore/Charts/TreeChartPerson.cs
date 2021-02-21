@@ -1,6 +1,6 @@
 ﻿/*
  *  "GEDKeeper", the personal genealogical database editor.
- *  Copyright (C) 2009-2018 by Sergey V. Zhdanovskih.
+ *  Copyright (C) 2009-2020 by Sergey V. Zhdanovskih.
  *
  *  This file is part of "GEDKeeper".
  *
@@ -23,6 +23,7 @@ using BSLib;
 using BSLib.DataViz.SmartGraph;
 using BSLib.Design.Graphics;
 using GDModel;
+using GKCore.Import;
 using GKCore.Options;
 using GKCore.Types;
 
@@ -99,6 +100,7 @@ namespace GKCore.Charts
         public bool IsCollapsed;
         public bool IsVisible;
         public IColor UserColor;
+        public bool Adopted;
 
 
         public IImage Portrait
@@ -395,7 +397,7 @@ namespace GKCore.Charts
                     CertaintyAssessment = 0.0f;
                 }
             } catch (Exception ex) {
-                Logger.LogWrite("TreeChartPerson.BuildBy(): " + ex.Message);
+                Logger.WriteError("TreeChartPerson.BuildBy()", ex);
                 throw;
             }
         }
@@ -464,7 +466,7 @@ namespace GKCore.Charts
                     //idx++;
                 }
             } catch (Exception ex) {
-                Logger.LogWrite("TreeChartPerson.InitInfo(): " + ex.Message);
+                Logger.WriteError("TreeChartPerson.InitInfo()", ex);
             }
         }
 
@@ -516,7 +518,7 @@ namespace GKCore.Charts
                     fWidth += imgW;
                 }
             } catch (Exception ex) {
-                Logger.LogWrite("TreeChartPerson.CalcBounds(): " + ex.Message);
+                Logger.WriteError("TreeChartPerson.CalcBounds()", ex);
             }
         }
 

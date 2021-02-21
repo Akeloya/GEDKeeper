@@ -1,6 +1,6 @@
 ﻿/*
  *  "GEDKeeper", the personal genealogical database editor.
- *  Copyright (C) 2009-2018 by Sergey V. Zhdanovskih.
+ *  Copyright (C) 2009-2020 by Sergey V. Zhdanovskih.
  *
  *  This file is part of "GEDKeeper".
  *
@@ -20,13 +20,14 @@
 
 using System;
 using System.Windows.Forms;
+using BSLib;
 using BSLib.Design.MVP.Controls;
 using GDModel;
 using GKCore;
 using GKCore.Controllers;
 using GKCore.Interfaces;
-using GKCore.MVP.Controls;
 using GKCore.MVP.Views;
+using GKCore.Options;
 using GKUI.Components;
 
 namespace GKUI.Forms
@@ -100,11 +101,6 @@ namespace GKUI.Forms
 
         #endregion
 
-        private void btnAccept_Click(object sender, EventArgs e)
-        {
-            DialogResult = fController.Accept() ? DialogResult.OK : DialogResult.None;
-        }
-
         public PersonalNameEditDlg(IBaseWindow baseWin)
         {
             InitializeComponent();
@@ -133,6 +129,34 @@ namespace GKUI.Forms
             lblNameSuffix.Text = LangMan.LS(LSID.LSID_NameSuffix);
             lblType.Text = LangMan.LS(LSID.LSID_Type);
             lblLanguage.Text = LangMan.LS(LSID.LSID_Language);
+        }
+
+        private void txtXName_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Down && e.Control) {
+                UIHelper.ProcessName(sender);
+            }
+        }
+
+        private void txtXName_Leave(object sender, EventArgs e)
+        {
+            UIHelper.ProcessName(sender);
+        }
+
+        private void btnAccept_Click(object sender, EventArgs e)
+        {
+            DialogResult = fController.Accept() ? DialogResult.OK : DialogResult.None;
+        }
+
+        private void btnCancel_Click(object sender, EventArgs e)
+        {
+            DialogResult = fController.Cancel() ? DialogResult.Cancel : DialogResult.None;
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            base.OnFormClosing(e);
+            e.Cancel = fController.CheckChangesPersistence();
         }
     }
 }

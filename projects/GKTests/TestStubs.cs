@@ -30,6 +30,7 @@ using GKCore.Export;
 using GKCore.Interfaces;
 using GKCore.Maps;
 using GKCore.MVP.Controls;
+using GKCore.Names;
 using GKCore.Plugins;
 using GKCore.Types;
 
@@ -61,10 +62,11 @@ namespace GKTests.Stubs
 
     internal class ProgressStub : IProgressController
     {
-        public void ProgressInit(string title, int max) {}
+        public void ProgressInit(string title, int max, bool cancelable = false) {}
         public void ProgressDone() {}
         public void ProgressStep() {}
         public void ProgressStep(int value) {}
+        public bool IsCanceled { get { return false; } }
     }
 
     internal class BaseWindowStub : WorkWindowStub, IBaseWindow

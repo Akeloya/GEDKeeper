@@ -26,6 +26,7 @@ using BSLib.Design.MVP.Controls;
 using GDModel;
 using GDModel.Providers.GEDCOM;
 using GKCore.Charts;
+using GKCore.Controllers;
 using GKCore.Interfaces;
 using GKCore.MVP.Views;
 using GKCore.Operations;
@@ -216,7 +217,7 @@ namespace GKCore.Lists
             IndividualListFilter iFilter = (IndividualListFilter)fFilter;
 
             if ((iFilter.Sex == GDMSex.svUnknown || fRec.Sex == iFilter.Sex)
-                && (iFilter.Name == "*" || IsMatchesMask(buf_fullname, iFilter.Name))
+                && (IsMatchesMask(buf_fullname, iFilter.Name))
                 && (iFilter.Residence == "*" || HasPlace())
                 && (iFilter.EventVal == "*" || HasEventVal())
                 && (!iFilter.PatriarchOnly || fRec.Patriarch))
@@ -287,8 +288,7 @@ namespace GKCore.Lists
 
         public override bool CheckFilter()
         {
-            bool res = (fBaseContext.IsRecordAccess(fRec.Restriction)
-                        && (QuickFilter == "*" || IsMatchesMask(buf_fullname, QuickFilter)));
+            bool res = (fBaseContext.IsRecordAccess(fRec.Restriction) && IsMatchesMask(buf_fullname, QuickFilter));
 
             res = res && CheckCommonFilter() && CheckExternalFilter(fRec) && CheckSpecificFilter();
 
@@ -303,7 +303,7 @@ namespace GKCore.Lists
                 result = GKUtils.GetNameString(fRec, true, false);
             } else {
                 NameFormat defNameFormat = GlobalOptions.Instance.DefNameFormat;
-                GKUtils.NamePartsRet parts;
+                NamePartsRet parts;
 
                 switch (defNameFormat) {
                     case NameFormat.nfFNP:
@@ -624,8 +624,7 @@ namespace GKCore.Lists
             var iRec = fDataOwner as GDMIndividualRecord;
             if (fSheetList == null || iRec == null) return;
 
-            try
-            {
+            try {
                 fSheetList.BeginUpdate();
                 fSheetList.ClearItems();
 
@@ -637,10 +636,8 @@ namespace GKCore.Lists
                 }
 
                 fSheetList.EndUpdate();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogWrite("GroupsSublistModel.UpdateContent(): " + ex.Message);
+            } catch (Exception ex) {
+                Logger.WriteError("GroupsSublistModel.UpdateContent()", ex);
             }
         }
 
@@ -712,7 +709,7 @@ namespace GKCore.Lists
 
                 fSheetList.EndUpdate();
             } catch (Exception ex) {
-                Logger.LogWrite("NamesSublistModel.UpdateContents(): " + ex.Message);
+                Logger.WriteError("NamesSublistModel.UpdateContents()", ex);
             }
         }
 
@@ -816,7 +813,7 @@ namespace GKCore.Lists
 
                 fSheetList.EndUpdate();
             } catch (Exception ex) {
-                Logger.LogWrite("ParentsSublistModel.UpdateContents(): " + ex.Message);
+                Logger.WriteError("ParentsSublistModel.UpdateContents()", ex);
             }
         }
 
@@ -899,8 +896,7 @@ namespace GKCore.Lists
             var iRec = fDataOwner as GDMIndividualRecord;
             if (fSheetList == null || iRec == null) return;
 
-            try
-            {
+            try {
                 fSheetList.BeginUpdate();
                 fSheetList.ClearItems();
 
@@ -931,10 +927,8 @@ namespace GKCore.Lists
                 }
 
                 fSheetList.EndUpdate();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogWrite("SpousesSublistModel.UpdateContents(): " + ex.Message);
+            } catch (Exception ex) {
+                Logger.WriteError("SpousesSublistModel.UpdateContents()", ex);
             }
         }
 
@@ -949,7 +943,7 @@ namespace GKCore.Lists
 
             switch (eArgs.Action) {
                 case RecordAction.raAdd:
-                    result = (BaseController.ModifyFamily(fBaseWin, ref family, TargetMode.tmFamilySpouse, iRec));
+                    result = (BaseController.ModifyFamily(fBaseWin, ref family, TargetMode.tmSpouse, iRec));
                     if (result) {
                         eArgs.ItemData = family;
                     }
@@ -1015,8 +1009,7 @@ namespace GKCore.Lists
             var iRec = fDataOwner as GDMIndividualRecord;
             if (fSheetList == null || iRec == null) return;
 
-            try
-            {
+            try {
                 fSheetList.BeginUpdate();
                 fSheetList.ClearItems();
 
@@ -1025,10 +1018,8 @@ namespace GKCore.Lists
                 }
 
                 fSheetList.EndUpdate();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogWrite("URefsSublistModel.UpdateContents(): " + ex.Message);
+            } catch (Exception ex) {
+                Logger.WriteError("URefsSublistModel.UpdateContents()", ex);
             }
         }
 

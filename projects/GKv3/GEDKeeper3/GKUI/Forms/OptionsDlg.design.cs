@@ -127,6 +127,18 @@ namespace GKUI.Forms
         private CheckBox chkAutoSortSpouses;
         private CheckBox chkCheckTreeSize;
         private CheckBox chkCharsetDetection;
+        private Label lblBackupRevisionsMaxCount;
+        private NumericUpDown numBackupRevisionsMaxCount;
+        private CheckBox chkAllowMediaStoreRelativeReferences;
+        private Label lblMediaStoreDefault;
+        private ComboBox cmbMediaStoreDefault;
+        private CheckBox chkAllowDeleteMediaFileFromStgArc;
+        private CheckBox chkAllowDeleteMediaFileFromRefs;
+        private CheckBox chkDeleteMediaFileWithoutConfirm;
+        private CheckBox chkFirstCapitalLetterInNames;
+        private Label lblDefaultDepth;
+        private NumericUpDown numDefaultDepth;
+        private CheckBox chkDialogClosingWarn;
 
         private void InitializeComponent()
         {
@@ -169,6 +181,15 @@ namespace GKUI.Forms
                 }
             };
 
+            lblBackupRevisionsMaxCount = new Label();
+            lblBackupRevisionsMaxCount.Text = "lblBackupRevisionsMaxCount";
+
+            numBackupRevisionsMaxCount = new NumericUpDown();
+            numBackupRevisionsMaxCount.MaxValue = 1000;
+            numBackupRevisionsMaxCount.MinValue = 0;
+            numBackupRevisionsMaxCount.Width = 80;
+            numBackupRevisionsMaxCount.Value = 0;
+
             groupBox1 = new GroupBox();
             groupBox1.Content = new DefTableLayout {
                 Rows = {
@@ -180,6 +201,13 @@ namespace GKUI.Forms
                         Cells = {
                             new DefStackLayout(Orientation.Horizontal) {
                                 Items = { chkAutosave, numASMin, lblMinutes }
+                            }
+                        }
+                    },
+                    new TableRow {
+                        Cells = {
+                            new DefStackLayout(Orientation.Horizontal) {
+                                Items = { lblBackupRevisionsMaxCount, numBackupRevisionsMaxCount }
                             }
                         }
                     }
@@ -268,6 +296,9 @@ namespace GKUI.Forms
             cmbLanguages = new ComboBox();
             cmbLanguages.ReadOnly = true;
 
+            chkDialogClosingWarn = new CheckBox();
+            chkDialogClosingWarn.Text = "chkDialogClosingWarn";
+
             grpOther = new GroupBox();
             grpOther.Text = "grpOther";
             grpOther.Content = new DefTableLayout {
@@ -283,6 +314,9 @@ namespace GKUI.Forms
                     },
                     new TableRow {
                         Cells = { chkCharsetDetection }
+                    },
+                    new TableRow {
+                        Cells = { chkDialogClosingWarn }
                     },
                     new TableRow {
                         Cells = { lblLanguage, cmbLanguages }
@@ -318,10 +352,38 @@ namespace GKUI.Forms
             chkRemovableMediaWarning = new CheckBox();
             chkRemovableMediaWarning.Text = "chkRemovableMediaWarning";
 
+            chkAllowMediaStoreRelativeReferences = new CheckBox();
+            chkAllowMediaStoreRelativeReferences.Text = "chkAllowMediaStoreRelativeReferences";
+
+            lblMediaStoreDefault = new Label();
+            lblMediaStoreDefault.Text = "lblMediaStoreDefault";
+
+            cmbMediaStoreDefault = new ComboBox();
+
+            chkAllowDeleteMediaFileFromStgArc = new CheckBox();
+            chkAllowDeleteMediaFileFromStgArc.Text = "chkAllowDeleteMediaFileFromStgArc";
+
+            chkAllowDeleteMediaFileFromRefs = new CheckBox();
+            chkAllowDeleteMediaFileFromRefs.Text = "chkAllowDeleteMediaFileFromRefs";
+
+            chkDeleteMediaFileWithoutConfirm = new CheckBox();
+            chkDeleteMediaFileWithoutConfirm.Text = "chkDeleteMediaFileWithoutConfirm";
+
             pageMultimedia = new TabPage();
             pageMultimedia.Text = "pageMultimedia";
             pageMultimedia.Content = new DefStackLayout(Orientation.Vertical) {
-                Items = { chkRemovableMediaWarning, chkEmbeddedMediaPlayer, chkAllowMediaDirectRefs }
+                Items = {
+                    chkRemovableMediaWarning,
+                    chkEmbeddedMediaPlayer,
+                    chkAllowMediaDirectRefs,
+                    chkAllowMediaStoreRelativeReferences,
+                    new DefStackLayout(Orientation.Horizontal) {
+                                Items = { lblMediaStoreDefault, cmbMediaStoreDefault }
+                            },
+                    chkAllowDeleteMediaFileFromStgArc,
+                    chkAllowDeleteMediaFileFromRefs,
+                    chkDeleteMediaFileWithoutConfirm
+                }
             };
 
             //
@@ -547,12 +609,27 @@ namespace GKUI.Forms
 
             //
 
+            lblDefaultDepth = new Label();
+            lblDefaultDepth.Text = "lblDefaultDepth";
+
+            numDefaultDepth = new NumericUpDown();
+            numDefaultDepth.MaxValue = 9;
+            numDefaultDepth.MinValue = -1;
+            numDefaultDepth.Width = 60;
+            numDefaultDepth.Value = -1;
+
             pageTreeChart = new TabPage();
             pageTreeChart.Text = "pageTreeChart";
             pageTreeChart.Content = new DefStackLayout(Orientation.Horizontal) {
                 Items = {
                     grpTreePersons,
-                    new DefStackLayout(Orientation.Vertical) { Items = { grpTreeDecor, grpSpacings } }
+                    new DefStackLayout(Orientation.Vertical) {
+                        Items = {
+                            grpTreeDecor,
+                            grpSpacings,
+                            new DefStackLayout(Orientation.Horizontal) { Items = { lblDefaultDepth, numDefaultDepth } }
+                        }
+                    }
                 }
             };
 
@@ -685,6 +762,9 @@ namespace GKUI.Forms
             chkAutoSortSpouses = new CheckBox();
             chkAutoSortSpouses.Text = "chkAutoSortSpouses";
 
+            chkFirstCapitalLetterInNames = new CheckBox();
+            chkFirstCapitalLetterInNames.Text = "chkFirstCapitalLetterInNames";
+
             //
 
             pageViewCommon = new TabPage();
@@ -697,7 +777,7 @@ namespace GKUI.Forms
                     new TableRow {
                         Cells = { grpAdvancedNames, new DefStackLayout(Orientation.Vertical) {
                                 Items = { chkPlacesWithAddress, chkHighlightUnparented, chkHighlightUnmarried,
-                                          chkAutoSortChildren, chkAutoSortSpouses}
+                                          chkAutoSortChildren, chkAutoSortSpouses, chkFirstCapitalLetterInNames }
                             }
                         }
                     },
